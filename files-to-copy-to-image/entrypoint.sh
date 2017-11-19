@@ -1,11 +1,19 @@
 #!/bin/bash +e
 # catch signals as PID 1 in a container
 
+pidpulse=0
+
 # SIGNAL-handler
 term_handler() {
   
   echo "terminating dbus ..."
   sudo /etc/init.d/dbus stop
+  
+  echo "terminating pulseaudio ..."
+  if [ $pidpulse -ne 0 ]; then
+        kill -SIGTERM "$pidpulse"
+        wait "$pidpulse"
+  fi
   
   exit 143; # 128 + 15 -- SIGTERM
 }
@@ -39,11 +47,15 @@ EndSection
 _EOF_
 done
 
-#set sound to HDMI output
+#set ALSA sound to HDMI output
 sudo amixer cset numid=3 2     
 sudo amixer cset numid=1 100%
 
 # run applications in the background
+
+echo "starting pulseaudio ..."
+sudo pulseaudio --system --high-priority --no-cpu-limit -v -L 'module-alsa-sink device=plughw:0,1' >/dev/null 2>&1 &
+pidpulse="$!"
 
 echo "starting dbus ..."
 sudo /etc/init.d/dbus start
