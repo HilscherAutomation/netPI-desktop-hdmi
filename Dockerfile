@@ -40,7 +40,7 @@ RUN apt-get install --no-install-recommends xserver-xorg \
 
 #install pulseaudio
 RUN apt-get install dbus pulseaudio \
-    && sed -i -e 's;load-module module-console-kit;#load-module module-console-kit;' /etc/pulse/default.pa
+    && sed -i -e 's;load-module module-console-kit;#load-module module-console-kit;' /etc/pulse/default.pa \
     && usermod -a -G audio testuser \
     && usermod -a -G pulse testuser \
     && usermod -a -G pulse-access testuser
