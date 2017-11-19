@@ -38,9 +38,13 @@ RUN apt-get install --no-install-recommends xserver-xorg \
     && apt-get install alsa-base alsa-oss alsa-utils alsa-tools mpg123 \
     && sed -i -e 's;Exec=xfce4-mixer;Exec=sudo xfce4-mixer;' /usr/share/applications/xfce4-mixer.desktop
 
+#install pulseaudio
 RUN apt-get install dbus pulseaudio \
     && sed -i -e 's;load-module module-console-kit;#load-module module-console-kit;' /etc/pulse/default.pa
-
+    && usermod -a -G audio testuser \
+    && usermod -a -G pulse testuser \
+    && usermod -a -G pulse-access testuser
+    
 #install chromium browser
 RUN apt-get install wget \
     && wget -O key.pgp https://bintray.com/user/downloadSubjectPublicKey?username=bintray \
