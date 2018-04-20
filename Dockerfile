@@ -1,31 +1,40 @@
 #use fixed armv7hf compatible debian version from group resin.io as base image
-FROM resin/armv7hf-debian:jessie-20171021
+FROM resin/armv7hf-debian:stretch
 
-#enable building ARM container on x86 machinery on the web (comment out next 3 lines if built on Raspberry) 
-ENV QEMU_EXECVE 1
-COPY armv7hf-debian-qemu /usr/bin
+#enable building ARM container on x86 machinery on the web (comment out next line if built on Raspberry) 
 RUN [ "cross-build-start" ]
-
-#execute all commands as root
-USER root
 
 #labeling
 LABEL maintainer="netpi@hilscher.com" \ 
-      version="V1.1.0.0" \
+      version="V1.2.0.0" \
       description="Desktop (HDMI) for netPI"
 
 #version
-ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.1.0.0
+ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.2.0.0
+
+ENV USER=testuser
+ENV PASSWORD=mypassword
+
+#copy files
+COPY "./init.d/*" /etc/init.d/
 
 #do user
 RUN apt-get update \
-    && useradd --create-home --shell /bin/bash testuser \
-    && echo 'testuser:mypassword' | chpasswd \
-    && adduser testuser tty \
-    && adduser testuser video \
-    && adduser testuser sudo \
-    && echo "testuser ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/testuser \
-    && chmod 0440 /etc/sudoers.d/testuser
+    && useradd --create-home --shell /bin/bash $USER \
+    && echo $USER:$PASSWORD | chpasswd \
+    && adduser $USER tty \
+    && adduser $USER video \
+    && adduser $USER sudo \
+    && adduser $USER input \
+    && echo $USER " ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USER \
+    && chmod 0440 /etc/sudoers.d/$USER
+
+#install ssh
+RUN apt-get update  \
+    && apt-get install -y openssh-server \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
+    && mkdir /var/run/sshd 
 
 #install xserver, desktop, login manager, ALSA sound driver
 RUN apt-get install --no-install-recommends xserver-xorg \
@@ -33,17 +42,19 @@ RUN apt-get install --no-install-recommends xserver-xorg \
     && apt-get install xfce4 xfce4-terminal \
     && mkdir /etc/X11/xorg.conf.d \
     && chmod u+s /usr/bin/Xorg \
-    && chown -c testuser /etc/X11/xorg.conf.d \
+    && chown -c $USER /etc/X11/xorg.conf.d \
+    && apt-get install xserver-xorg-input-evdev \
     && apt-get install gnome-icon-theme tango-icon-theme \
-    && apt-get install alsa-base alsa-oss alsa-utils alsa-tools mpg123 \
-    && sed -i -e 's;Exec=xfce4-mixer;Exec=sudo xfce4-mixer;' /usr/share/applications/xfce4-mixer.desktop
+    && apt-get install alsa-oss alsa-tools alsa-tools-gui alsa-utils alsamixergui mpg123 \
+    && touch /home/$USER/.Xauthority \
+    && chmod 777 /home/$USER/.Xauthority
 
 #install pulseaudio
-RUN apt-get install dbus pulseaudio \
+RUN apt-get install dbus-x11 pulseaudio \
     && sed -i -e 's;load-module module-console-kit;#load-module module-console-kit;' /etc/pulse/default.pa \
-    && usermod -a -G audio testuser \
-    && usermod -a -G pulse testuser \
-    && usermod -a -G pulse-access testuser
+    && usermod -a -G audio $USER \
+    && usermod -a -G pulse $USER \
+    && usermod -a -G pulse-access $USER
     
 #install chromium browser
 RUN apt-get install wget \
@@ -54,14 +65,11 @@ RUN apt-get install wget \
     && apt-get install chromium-browser \
     && rm key.pgp
 
-#allow all users to use X11
-RUN sed -i -e 's/allowed_users=console/allowed_users=anybody/g' /etc/X11/Xwrapper.config \
-    && echo "needs_root_rights=yes">>/etc/X11/Xwrapper.config
+#set the entrypoint
+ENTRYPOINT ["/etc/init.d/entrypoint.sh"]
 
-#do startscript
-COPY "./files-to-copy-to-image/entrypoint.sh" /
-RUN chmod +x /entrypoint.sh 
-ENTRYPOINT ["/entrypoint.sh"]
+#SSH port
+EXPOSE 22
 
 #set STOPSGINAL
 STOPSIGNAL SIGTERM
@@ -70,4 +78,4 @@ STOPSIGNAL SIGTERM
 RUN [ "cross-build-end" ]
 
 #start container as non-root user, else chromium will not run
-USER testuser
+USER $USER

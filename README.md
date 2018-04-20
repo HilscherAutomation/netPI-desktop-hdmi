@@ -4,7 +4,9 @@ Made for [netPI](https://www.netiot.com/netpi/), the Open Edge Connectivity Ecos
 
 ### Debian with X.org display server, desktop Xfce and ALSA audio
 
-Base of this image builds a tagged version of [debian:jessie](https://hub.docker.com/r/resin/armv7hf-debian/tags/) with installed display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) enabling the device's HDMI port plus the desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop computer with mouse and keyboard support. Additonally it embeds the [ALSA](https://wiki.debian.org/ALSA) Audio Sound package for sending the sound across HDMI.
+The image provided hereunder deploys a container with installed Debian, display server, desktop environment and ssh server.
+
+Base of this image builds a tagged version of [debian:stretch](https://hub.docker.com/r/resin/armv7hf-debian/tags/) with installed display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) enabling the device's HDMI port plus the desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop computer with mouse and keyboard support. Additonally it embeds the [ALSA](https://wiki.debian.org/ALSA) Audio Sound package for sending the sound across HDMI.
 
 #### Container prerequisites
 
@@ -70,18 +72,17 @@ STEP 3. Run a container instance of the image using the following command line
 
 #### Accessing
 
-Make sure you have a mouse and keyboard connected before you start the container, else they will not be recognized. A HDMI monitor will only be recognized if it was already connected during netPI'S boot sequence, else its screen remains black. For simple tests use Firefox (icewaesel) to do some web page visits.
+Make sure you have a mouse and keyboard connected before you start the container, else they will not be recognized. A HDMI monitor will only be recognized if it was already connected during netPI'S boot sequence, else its screen remains black. For simple tests use Chromium to do some web page visits.
 
 #### Tags
 
 * **hilscher/netPI-desktop-hdmi:latest** - non-versioned latest development output of the master branch. Shouldn't be used since under development all the time.
 
-* **hilscher/netPI-desktop-hdmi:0.9.1.0** - runs with netPI's system software version V0.9.1.0. In this version the dbus host socket needs to be exposed to the container to run bluetooth **Volumes > Volume mapping > map additional volume** : `container: /var/run/docker.sock (bind)-> volume: /var/run/docker.sock(writeable)`.
-
-* **hilscher/netPI-desktop-hdmi:1.1.0.0** - runs with netPI's system software version V1.1.0.0.
-
-#### GitHub sources
+#### GitHub sources and licenses
 The image is built from the GitHub project [netPI-desktop-hdmi](https://github.com/hilscher/netPI-desktop-hdmi). It complies with the [Dockerfile](https://docs.docker.com/engine/reference/builder/) method to build a Docker image [automated](https://docs.docker.com/docker-hub/builds/).
+
+View the license information for the software in the Github project. As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
+As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.
 
 To build the container for an ARM CPU on [Docker Hub](https://hub.docker.com/)(x86 based) the Dockerfile uses the method described here [resin.io](https://resin.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/).
 

@@ -14,6 +14,9 @@ term_handler() {
         kill -SIGTERM "$pidpulse"
         wait "$pidpulse"
   fi
+
+  echo "terminating ssh ..."
+  sudo /etc/init.d/ssh stop
   
   exit 143; # 128 + 15 -- SIGTERM
 }
@@ -59,6 +62,17 @@ pidpulse="$!"
 
 echo "starting dbus ..."
 sudo /etc/init.d/dbus start
+
+echo "starting ssh ..."
+sudo /etc/init.d/ssh start
+
+#set rights
+sudo chmod -R 777 /dev/tty0
+sudo chmod -R 777 /dev/tty1
+sudo chmod -R 777 /dev/tty2
+sudo chmod -R 777 /dev/snd
+sudo chmod -R 777 /dev/input
+sudo chmod -R 777 /dev/fb0
 
 echo "starting X ..."
 /usr/bin/startx &
