@@ -2,11 +2,11 @@
 
 Made for [netPI](https://www.netiot.com/netpi/), the Open Edge Connectivity Ecosystem 
 
-### Debian with X.org display server, desktop Xfce and ALSA audio
+### Debian with X.org display server, desktop Xfce, VNC and ALSA audio
 
 The image provided hereunder deploys a container with installed Debian, display server, desktop environment and ssh server.
 
-Base of this image builds a tagged version of [debian:stretch](https://hub.docker.com/r/resin/armv7hf-debian/tags/) with installed display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) enabling the device's HDMI port plus the desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop computer with mouse and keyboard support. Additonally it embeds the [ALSA](https://wiki.debian.org/ALSA) Audio Sound package for sending the sound across HDMI.
+Base of this image builds a tagged version of [debian:stretch](https://hub.docker.com/r/resin/armv7hf-debian/tags/) with installed display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) enabling the device's HDMI port plus the desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop computer with mouse and keyboard support. Additonally it embeds the [ALSA](https://wiki.debian.org/ALSA) Audio Sound package for sending the sound across HDMI. Also the [x11vnc](https://en.wikipedia.org/wiki/X11vnc) server is installed to access to the desktop screen from remote via VNC clients.
 
 #### Container prerequisites
 
@@ -72,7 +72,14 @@ STEP 3. Run a container instance of the image using the following command line
 
 #### Accessing
 
-Make sure you have a mouse and keyboard connected before you start the container, else they will not be recognized. A HDMI monitor will only be recognized if it was already connected during netPI'S boot sequence, else its screen remains black. For simple tests use Chromium to do some web page visits.
+The container starts the desktop, the SSH server and VNC server automatically.
+
+In desktop mode make sure you have a mouse and keyboard connected before you start the container, else they will not be recognized. A HDMI monitor will only be recognized if it was already connected during netPI's boot sequence, else its screen remains black. For simple tests use Chromium to do some web page visits.
+
+Alternatively login from remote via a VNC client such as [uVNC](https://www.uvnc.com/) to netPI's IP address at port `5900` to display the screen on another computer. Use the password `mypassword` when asked in your client.
+
+Another alternative is to login to the container with an SSH client such as [putty](http://www.putty.org/) using netPI's IP address at port `22`. Use the credentials `testuser` as user and `mypassword` as password when asked and you are logged in as user testuser.
+
 
 #### Tags
 
@@ -84,6 +91,6 @@ The image is built from the GitHub project [netPI-desktop-hdmi](https://github.c
 View the license information for the software in the Github project. As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
 As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.
 
-To build the container for an ARM CPU on [Docker Hub](https://hub.docker.com/)(x86 based) the Dockerfile uses the method described here [resin.io](https://resin.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/).
+Hint: Cross-building the image for an ARM architecture based CPU on [Docker Hub](https://hub.docker.com/)(x86 CPU based servers) the Dockerfile uses the method described here [resin.io](https://resin.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/). If you want to build the image on a Raspberry Pi directly then comment out the two lines `RUN [ "cross-build-start" ]` and `RUN [ "cross-build-end" ]` in the file Dockerfile before.
 
 [![N|Solid](http://www.hilscher.com/fileadmin/templates/doctima_2013/resources/Images/logo_hilscher.png)](http://www.hilscher.com)  Hilscher Gesellschaft fuer Systemautomation mbH  www.hilscher.com

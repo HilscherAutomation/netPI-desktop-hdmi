@@ -5,6 +5,8 @@ pidpulse=0
 
 # SIGNAL-handler
 term_handler() {
+  echo "terminating VNC ..."
+  sudo /usr/bin/x11vnc -R stop
   
   echo "terminating dbus ..."
   sudo /etc/init.d/dbus stop
@@ -76,6 +78,10 @@ sudo chmod -R 777 /dev/fb0
 
 echo "starting X ..."
 /usr/bin/startx &
+
+echo "starting VNC after 10 seconds..."
+sleep 10
+/usr/bin/x11vnc -usepw -forever -display :0 -bg
 
 # wait forever not to exit the container
 while true

@@ -6,14 +6,14 @@ RUN [ "cross-build-start" ]
 
 #labeling
 LABEL maintainer="netpi@hilscher.com" \ 
-      version="V1.2.0.0" \
+      version="V1.2.1" \
       description="Desktop (HDMI) for netPI"
 
 #version
-ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.2.0.0
+ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.2.1
 
 ENV USER=testuser
-ENV PASSWORD=mypassword
+ENV PASSWD=mypassword
 
 #copy files
 COPY "./init.d/*" /etc/init.d/
@@ -21,7 +21,7 @@ COPY "./init.d/*" /etc/init.d/
 #do user
 RUN apt-get update \
     && useradd --create-home --shell /bin/bash $USER \
-    && echo $USER:$PASSWORD | chpasswd \
+    && echo $USER:$PASSWD | chpasswd \
     && adduser $USER tty \
     && adduser $USER video \
     && adduser $USER sudo \
@@ -48,6 +48,13 @@ RUN apt-get install --no-install-recommends xserver-xorg \
     && apt-get install alsa-oss alsa-tools alsa-tools-gui alsa-utils alsamixergui mpg123 \
     && touch /home/$USER/.Xauthority \
     && chmod 777 /home/$USER/.Xauthority
+
+#install VNC
+RUN apt-get install x11vnc \
+    && mkdir /home/$USER/.vnc \
+    && chown $USER:$USER /home/$USER/.vnc \
+    && x11vnc -storepasswd "$PASSWD" /home/$USER/.vnc/passwd \
+    && chown $USER:$USER /home/$USER/.vnc/passwd
 
 #install pulseaudio
 RUN apt-get install dbus-x11 pulseaudio \
