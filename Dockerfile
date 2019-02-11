@@ -1,16 +1,26 @@
-#use fixed armv7hf compatible debian version from group balena as base image
+#use armv7hf compatible base image
 FROM balenalib/armv7hf-debian:stretch
+
+#dynamic build arguments coming from the /hooks/build file
+ARG BUILD_DATE
+ARG VCS_REF
+
+#metadata labels
+LABEL org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.vcs-url="https://github.com/HilscherAutomation/netPI-desktop-hdmi" \
+      org.label-schema.vcs-ref=$VCS_REF
 
 #enable building ARM container on x86 machinery on the web (comment out next line if built on Raspberry) 
 RUN [ "cross-build-start" ]
 
-#labeling
-LABEL maintainer="netpi@hilscher.com" \ 
-      version="V1.2.1" \
-      description="Desktop (HDMI) for netPI"
-
 #version
 ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.2.1
+
+
+#labeling
+LABEL maintainer="netpi@hilscher.com" \ 
+      version=$HILSCHERNETPI_DESKTOP_HDMI_VERSION \
+      description="Desktop (HDMI) for netPI"
 
 ENV USER=testuser
 ENV PASSWD=mypassword

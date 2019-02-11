@@ -1,5 +1,10 @@
 ## Desktop (Xfce)
 
+[![](https://images.microbadger.com/badges/image/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Desktop")
+[![](https://images.microbadger.com/badges/commit/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi//netpi-desktop-hdmi "Desktop")
+[![Docker Registry](https://img.shields.io/docker/pulls/hilschernetpi/netpi-desktop-hdmi.svg)](https://registry.hub.docker.com/u/hilschernetpi/netpi-desktop-hdmi/)&nbsp;
+[![Image last updated](https://img.shields.io/badge/dynamic/json.svg?url=https://api.microbadger.com/v1/images/hilschernetpi/netpi-desktop-hdmi&label=Image%20last%20updated&query=$.LastUpdated&colorB=007ec6)](http://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Image last updated")&nbsp;
+
 Made for [netPI](https://www.netiot.com/netpi/), the Raspberry Pi 3B Architecture based industrial suited Open Edge Connectivity Ecosystem 
 
 ### Debian with X.org display server, desktop Xfce, VNC and ALSA audio
@@ -20,7 +25,9 @@ The following host devices need to be exposed to the container
 
 ##### Privileged mode
 
-Only the privileged mode option lifts the enforced container limitations to allow usage of X.org display server in a container.
+The privileged mode option needs to be activated to lift the standard Docker enforced container limitations. With this setting the container and the applications inside are the getting (almost) all capabilities as if running on the Host directly. 
+
+netPI's secure reference software architecture prohibits root access to the Host system always. Even if priviledged mode is activated the intrinsic security of the Host Linux Kernel can not be compromised.
 
 ##### Host network
 
@@ -30,25 +37,28 @@ The container needs the "Host" network stack to be shared with the container.
 
 ##### On netPI
 
-STEP 1. Open netPI's landing page under `https://<netpi's ip address>`.
+STEP 1. Open netPI's website in your browser (https).
 
 STEP 2. Click the Docker tile to open the [Portainer.io](http://portainer.io/) Docker management user interface.
 
-STEP 3. Enter the following parameters under **Containers > Add Container**
+STEP 3. Enter the following parameters under *Containers > + Add Container*
 
-* **Image**: `hilschernetpi/netpi-desktop-hdmi`
+Parameter | Value | Remark
+:---------|:------ |:------
+*Image* | **hilschernetpi/netpi-desktop-hdmi**
+*Network > Network* | **Host** |
+*Port mapping* | *host* **22** -> *container* **22** | *host*=any unused
+*Restart policy* | **always**
+*Runtime > Devices > +add device* | *Host path* **/dev/tty0** -> *Container path* **/dev/tty0** | 
+*Runtime > Devices > +add device* | *Host path* **/dev/tty2** -> *Container path* **/dev/tty2** | 
+*Runtime > Devices > +add device* | *Host path* **/dev/fb0** -> *Container path* **/dev/fb0** | 
+*Runtime > Devices > +add device* | *Host path* **/dev/input** -> *Container path* **/dev/input** | 
+*Runtime > Devices > +add device* | *Host path* **/dev/snd** -> *Container path* **/dev/snd** | 
+*Runtime > Privileged mode* | **On** |
 
-* **Network > Network**: `Host`
+STEP 4. Press the button *Actions > Start/Deploy container*
 
-* **Restart policy"** : `always`
-
-* **Runtime > Privileged mode** : `On`
-
-* **Runtime > Devices > add device**: `Host "/dev/tty0" -> Container "/dev/tty0"`and`Host "/dev/tty2" -> Container "/dev/tty2"`and`Host "/dev/fb0" -> Container "/dev/fb0"`and`Host "/dev/input" -> Container "/dev/input"`and`Host "/dev/snd" -> Container "/dev/snd"`
-
-STEP 4. Press the button **Actions > Start/Deploy container**
-
-Pulling the image may take a while (5-10mins). Sometimes it takes so long that a time out is indicated. In this case repeat the **Actions > Start/Deploy container** action.
+Pulling the image may take a while (5-10mins). Sometimes it may take too long and a time out is indicated. In this case repeat STEP 4.
 
 ##### On Pi 3 for test
 
