@@ -1,4 +1,4 @@
-## Desktop (Xfce)
+## Desktop
 
 [![](https://images.microbadger.com/badges/image/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Desktop")
 [![](https://images.microbadger.com/badges/commit/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi//netpi-desktop-hdmi "Desktop")
@@ -31,7 +31,9 @@ netPI's secure reference software architecture prohibits root access to the Host
 
 ##### Host network
 
-The container needs the "Host" network stack to be shared with the container.
+The container needs the Docker "Host" network stack to be shared with the container. 
+
+Hint: Using this mode makes port mapping unnecessary since all the container's used ports are exposed to the host. This is why the container's used SSH server port `22` and VNC port `5900` are getting available on the host without a discrete port mapping.
 
 #### Getting started
 
@@ -47,7 +49,6 @@ Parameter | Value | Remark
 :---------|:------ |:------
 *Image* | **hilschernetpi/netpi-desktop-hdmi**
 *Network > Network* | **Host** |
-*Port mapping* | *host* **22** -> *container* **22** | *host*=any unused
 *Restart policy* | **always**
 *Runtime > Devices > +add device* | *Host path* **/dev/tty0** -> *Container path* **/dev/tty0** | 
 *Runtime > Devices > +add device* | *Host path* **/dev/tty2** -> *Container path* **/dev/tty2** | 
@@ -59,26 +60,6 @@ Parameter | Value | Remark
 STEP 4. Press the button *Actions > Start/Deploy container*
 
 Pulling the image may take a while (5-10mins). Sometimes it may take too long and a time out is indicated. In this case repeat STEP 4.
-
-##### On Pi 3 for test
-
-STEP 1. Establish a [console](https://www.raspberrypi.org/documentation/usage/terminal/README.md) connection to Pi 3.
-
-STEP 2. [Install](https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/) Docker if not already done, else skip. 
-
-STEP 3. Run a container instance of the image using the following command line
-
-`docker run 
-   --device="/dev/tty0" 
-   --device="/dev/tty2" 
-   --device="/dev/fb0"
-   --device="/dev/input"
-   --device="/dev/snd"
-   --net=host
-   --restart=always
-   --privileged
-   hilschernetpi/netpi-desktop-hdmi
-`
 
 #### Accessing
 
