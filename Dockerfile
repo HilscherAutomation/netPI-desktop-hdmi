@@ -14,7 +14,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN [ "cross-build-start" ]
 
 #version
-ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.2.1
+ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.2.2
 
 
 #labeling
@@ -81,6 +81,9 @@ RUN apt-get install wget \
     && apt-get update \
     && apt-get install chromium-browser \
     && rm key.pgp
+
+#installe screensaver
+RUN apt-get install xscreensaver
 
 #set the entrypoint
 ENTRYPOINT ["/etc/init.d/entrypoint.sh"]
