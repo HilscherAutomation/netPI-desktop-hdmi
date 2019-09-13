@@ -7,35 +7,41 @@
 
 Made for [netPI](https://www.netiot.com/netpi/), the Raspberry Pi 3B Architecture based industrial suited Open Edge Connectivity Ecosystem 
 
+### Secured netPI Docker
+
+netPI features a restricted Docker protecting the system software's integrity by maximum. The restrictions are 
+
+* privileged mode is not automatically adding all host devices `/dev/` to a container
+* volume bind mounts to rootfs is not supported
+* the devices `/dev`,`/dev/mem`,`/dev/sd*`,`/dev/dm*`,`/dev/mapper`,`/dev/mmcblk*` cannot be added to a container
+
 ### Container features
 
 The image provided hereunder deploys a container with installed Debian, display server, desktop environment, virtual network computing, remote desktop software and ssh server.
 
 Base of this image builds [debian](https://www.balena.io/docs/reference/base-images/base-images/) with installed HDMI display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) and a desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop PC. The [ALSA](https://wiki.debian.org/ALSA) audio sound package outputs on HDMI. The [REALVNC](https://www.realvnc.com/) server enables the access from remote via VNC clients, while the [AnyDesk](https://anydesk.com/) server the access over the internet.
 
-#### Container setup
+### Container setup
 
-##### Port mapping, network mode
+#### Port mapping, network mode
 
 The container needs to run in `host` network mode.
 
 Using this mode makes port mapping unnecessary since all the used container ports (like 22) are exposed to the host automatically.
 
-##### Host devices
+#### Host devices
 
-The secured netPI Docker requires adding ALL needed devices manually (even in privileged mode). The following host devices need to be added to the container
+The following host devices need to be added to the container
 
 * **for HDMI support** the devices `/dev/tty0`,`/dev/tty2`,`/dev/fb0`
 * **for mouse and keyboard support** the device `/dev/input`
 * **for sound over HDMI support** the device `/dev/snd`
 
-##### Privileged mode
+#### Privileged mode
 
 The privileged mode option needs to be activated to lift the standard Docker enforced container limitations. With this setting the container and the applications inside are the getting (almost) all capabilities as if running on the Host directly. 
 
-netPI's secure reference software architecture prohibits root access to the Host system always. Even if priviledged mode is activated the intrinsic security of the Host Linux Kernel can not be compromised.
-
-#### Container deployment
+### Container deployment
 
 STEP 1. Open netPI's website in your browser (https).
 
@@ -59,7 +65,7 @@ STEP 4. Press the button *Actions > Start/Deploy container*
 
 Pulling the image may take a while (5-10mins). Sometimes it may take too long and a time out is indicated. In this case repeat STEP 4.
 
-#### Container access
+### Container access
 
 Make sure you have a mouse and keyboard connected before you start the container else they are not recognized. 
 
@@ -67,23 +73,23 @@ A HDMI monitor in general will only be recognized if it was already connected du
 
 The container starts the desktop over HDMI, the SSH server, the VNC server and AnyDesk automatically when deployed.
 
-##### ssh
+#### ssh
 
 Login to the container with an SSH client such as [putty](http://www.putty.org/) using netPI's IP address at port `22`. Use the credentials `testuser` as user and `mypassword` as password when asked and you are logged in as user testuser.
 
-##### VNC
+#### VNC
 
 Control the desktop with any VNC client over port `5900`. The [REALVNC viewer](https://www.realvnc.com/en/connect/download/viewer/) works right away. For others like [UltraVNC](https://www.uvnc.com/downloads/ultravnc.html) change the authentication method in the server/options/security/authentication settings from `UNIX password` to `VNC password`.
 
-##### AnyDesk
+#### AnyDesk
 
 Control the desktop over the internet with [AnyDesk software](https://anydesk.com/en). Use the `This Desk ID` shown on the desktop in the AnyDesk software `Remote Desk ID` field to connect. Accept the connection on the desktop afterwards.
 
-#### Container tips & tricks
+### Container tips & tricks
 
 For additional help or information visit the Hilscher Forum at https://forum.hilscher.com/
 
-#### Container automated build
+### Container automated build
 
 The project complies with the scripting based [Dockerfile](https://docs.docker.com/engine/reference/builder/) method to build the image output file. Using this method is a precondition for an [automated](https://docs.docker.com/docker-hub/builds/) web based build process on DockerHub platform.
 
