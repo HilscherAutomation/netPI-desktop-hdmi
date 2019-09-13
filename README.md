@@ -7,17 +7,23 @@
 
 Made for [netPI](https://www.netiot.com/netpi/), the Raspberry Pi 3B Architecture based industrial suited Open Edge Connectivity Ecosystem 
 
-### Debian with X.org display server, desktop Xfce, VNC and ALSA audio
+### Container features
 
-The image provided hereunder deploys a container with installed Debian, display server, desktop environment and ssh server.
+The image provided hereunder deploys a container with installed Debian, display server, desktop environment, virtual network computing, remote desktop software and ssh server.
 
-Base of this image builds [debian](https://www.balena.io/docs/reference/base-images/base-images/) with installed display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) enabling the device's HDMI port plus the desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop computer with mouse and keyboard support. Additonally it embeds the [ALSA](https://wiki.debian.org/ALSA) Audio Sound package for sending the sound across HDMI. Also the [x11vnc](https://en.wikipedia.org/wiki/X11vnc) server is installed to access to the desktop screen from remote via VNC clients.
+Base of this image builds [debian](https://www.balena.io/docs/reference/base-images/base-images/) with installed HDMI display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) and a desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop PC. The [ALSA](https://wiki.debian.org/ALSA) audio sound package outputs on HDMI. The [REALVNC](https://www.realvnc.com/) server enables the access from remote via VNC clients, while the [AnyDesk](https://anydesk.com/) server the access over the internet.
 
-#### Container prerequisites
+#### Container setup
+
+##### Port mapping, network mode
+
+The container needs to run in `host` network mode.
+
+Using this mode makes port mapping unnecessary since all the used container ports (like 22) are exposed to the host automatically.
 
 ##### Host devices
 
-The following host devices need to be exposed to the container
+The secured netPI Docker requires adding ALL needed devices manually (even in privileged mode). The following host devices need to be added to the container
 
 * **for HDMI support** the devices `/dev/tty0`,`/dev/tty2`,`/dev/fb0`
 * **for mouse and keyboard support** the device `/dev/input`
@@ -29,15 +35,7 @@ The privileged mode option needs to be activated to lift the standard Docker enf
 
 netPI's secure reference software architecture prohibits root access to the Host system always. Even if priviledged mode is activated the intrinsic security of the Host Linux Kernel can not be compromised.
 
-##### Host network
-
-The container needs the Docker "Host" network stack to be shared with the container. 
-
-Hint: Using this mode makes port mapping unnecessary since all the container's used ports are exposed to the host. This is why the container's used SSH server port `22` and VNC port `5900` are getting available on the host without a discrete port mapping.
-
-#### Getting started
-
-##### On netPI
+#### Container deployment
 
 STEP 1. Open netPI's website in your browser (https).
 
@@ -61,21 +59,35 @@ STEP 4. Press the button *Actions > Start/Deploy container*
 
 Pulling the image may take a while (5-10mins). Sometimes it may take too long and a time out is indicated. In this case repeat STEP 4.
 
-#### Accessing
+#### Container access
 
-The container starts the desktop, the SSH server and VNC server automatically when started.
+Make sure you have a mouse and keyboard connected before you start the container else they are not recognized. 
 
-In desktop mode make sure you have a mouse and keyboard connected before you start the container, else they will not be recognized. A HDMI monitor will only be recognized if it was already connected during netPI's boot sequence, else its screen remains black. For simple tests use Chromium to do some web page visits.
+A HDMI monitor in general will only be recognized if it was already connected during netPI's boot sequence else the screen remains black.
 
-Alternatively login from remote via a VNC client such as [uVNC](https://www.uvnc.com/) to netPI's IP address at port `5900` to display the screen on another computer. Use the password `mypassword` when asked in your client.
+The container starts the desktop over HDMI, the SSH server, the VNC server and AnyDesk automatically when deployed.
 
-Another alternative is to login to the container with an SSH client such as [putty](http://www.putty.org/) using netPI's IP address at port `22`. Use the credentials `testuser` as user and `mypassword` as password when asked and you are logged in as user testuser.
+##### ssh
 
-#### Automated build
+Login to the container with an SSH client such as [putty](http://www.putty.org/) using netPI's IP address at port `22`. Use the credentials `testuser` as user and `mypassword` as password when asked and you are logged in as user testuser.
+
+##### VNC
+
+Control the desktop with any VNC client over port `5900`. The [REALVNC viewer](https://www.realvnc.com/en/connect/download/viewer/) works right away. For others like [UltraVNC](https://www.uvnc.com/downloads/ultravnc.html) change the authentication method in the server/options/security/authentication settings from `UNIX password` to `VNC password`.
+
+##### AnyDesk
+
+Control the desktop over the internet with [AnyDesk software](https://anydesk.com/en). Use the `This Desk ID` shown on the desktop in the AnyDesk software `Remote Desk ID` field to connect. Accept the connection on the desktop afterwards.
+
+#### Container tips & tricks
+
+For additional help or information visit the Hilscher Forum at https://forum.hilscher.com/
+
+#### Container automated build
 
 The project complies with the scripting based [Dockerfile](https://docs.docker.com/engine/reference/builder/) method to build the image output file. Using this method is a precondition for an [automated](https://docs.docker.com/docker-hub/builds/) web based build process on DockerHub platform.
 
-DockerHub web platform is x86 CPU based, but an ARM CPU coded output file is needed for Raspberry systems. This is why the Dockerfile includes the [balena](https://balena.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/) steps.
+DockerHub web platform is x86 CPU based, but an ARM CPU coded output file is needed for Raspberry Pi systems. This is why the Dockerfile includes the [balena](https://balena.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/) steps.
 
 #### License
 
