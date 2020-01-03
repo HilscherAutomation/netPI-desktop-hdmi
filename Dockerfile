@@ -1,5 +1,5 @@
 #use armv7hf compatible base image
-FROM balenalib/armv7hf-debian:buster
+FROM balenalib/armv7hf-debian:buster-20191223
 
 #dynamic build arguments coming from the /hooks/build file
 ARG BUILD_DATE
@@ -14,7 +14,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN [ "cross-build-start" ]
 
 #version
-ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.3.0
+ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.3.1
 
 #labeling
 LABEL maintainer="netpi@hilscher.com" \ 
@@ -26,11 +26,8 @@ ENV USER=testuser
 ENV PASSWD=mypassword
 
 #update source lists, keys
-RUN echo "deb http://archive.raspberrypi.org/debian/ buster main" | tee -a /etc/apt/sources.list \
- && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 82B129927FA3303E \
- && gpg -a --export 82B129927FA3303E | apt-key add - \
- && apt update \
 #create testuser
+RUN apt-get update \
  && useradd --create-home --shell /bin/bash $USER \
  && echo $USER:$PASSWD | chpasswd \
  && adduser $USER tty \
@@ -70,6 +67,10 @@ RUN apt-get update && apt install -y \
  && echo "/opt/vc/lib" >/etc/ld.so.conf.d/00-vmcs.conf \
  && /sbin/ldconfig \
  && rm -rf /opt/vc/src \
+ && echo "deb http://archive.raspberrypi.org/debian/ buster main" | tee -a /etc/apt/sources.list \
+ && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 82B129927FA3303E \
+ && gpg -a --export 82B129927FA3303E | apt-key add - \
+ && apt update \
  && apt install -y \
 #install VNC
     realvnc-vnc-server \

@@ -2,7 +2,7 @@
 
 [![](https://images.microbadger.com/badges/image/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Desktop")
 [![](https://images.microbadger.com/badges/commit/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi//netpi-desktop-hdmi "Desktop")
-[![Docker Registry](https://img.shields.io/docker/pulls/hilschernetpi/netpi-desktop-hdmi.svg)](https://registry.hub.docker.com/u/hilschernetpi/netpi-desktop-hdmi/)&nbsp;
+[![Docker Registry](https://img.shields.io/docker/pulls/hilschernetpi/netpi-desktop-hdmi.svg)](https://registry.hub.docker.com/r/hilschernetpi/netpi-desktop-hdmi/)&nbsp;
 [![Image last updated](https://img.shields.io/badge/dynamic/json.svg?url=https://api.microbadger.com/v1/images/hilschernetpi/netpi-desktop-hdmi&label=Image%20last%20updated&query=$.LastUpdated&colorB=007ec6)](http://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Image last updated")&nbsp;
 
 Made for [netPI](https://www.netiot.com/netpi/), the Raspberry Pi 3B Architecture based industrial suited Open Edge Connectivity Ecosystem 
