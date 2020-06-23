@@ -1,19 +1,11 @@
 ## Desktop
 
-[![](https://images.microbadger.com/badges/image/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Desktop")
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![](https://images.microbadger.com/badges/commit/hilschernetpi/netpi-desktop-hdmi.svg)](https://microbadger.com/images/hilschernetpi//netpi-desktop-hdmi "Desktop")
 [![Docker Registry](https://img.shields.io/docker/pulls/hilschernetpi/netpi-desktop-hdmi.svg)](https://registry.hub.docker.com/r/hilschernetpi/netpi-desktop-hdmi/)&nbsp;
 [![Image last updated](https://img.shields.io/badge/dynamic/json.svg?url=https://api.microbadger.com/v1/images/hilschernetpi/netpi-desktop-hdmi&label=Image%20last%20updated&query=$.LastUpdated&colorB=007ec6)](http://microbadger.com/images/hilschernetpi/netpi-desktop-hdmi "Image last updated")&nbsp;
 
-Made for [netPI](https://www.netiot.com/netpi/), the Raspberry Pi 3B Architecture based industrial suited Open Edge Connectivity Ecosystem 
-
-### Secured netPI Docker
-
-netPI features a restricted Docker protecting the system software's integrity by maximum. The restrictions are 
-
-* privileged mode is not automatically adding all host devices `/dev/` to a container
-* volume bind mounts to rootfs is not supported
-* the devices `/dev`,`/dev/mem`,`/dev/sd*`,`/dev/dm*`,`/dev/mapper`,`/dev/mmcblk*` cannot be added to a container
+Made for Raspberry Pi 3B architecture based devices and compatibles
 
 ### Container features
 
@@ -21,13 +13,40 @@ The image provided hereunder deploys a container with installed Debian, display 
 
 Base of this image builds [debian](https://www.balena.io/docs/reference/base-images/base-images/) with installed HDMI display server [X.org](https://en.wikipedia.org/wiki/X.Org_Server) and a desktop environment [Xfce](https://www.xfce.org/?lang=en) turning the device in a desktop PC. The [ALSA](https://wiki.debian.org/ALSA) audio sound package outputs on HDMI. The [REALVNC](https://www.realvnc.com/) server enables the access from remote via VNC clients, while the [AnyDesk](https://anydesk.com/) server the access over the internet.
 
+### Container hosts
+
+The container has been successfully tested on the following hosts
+
+* netPI, model RTE 3, product name NIOT-E-NPI3-51-EN-RE
+* netPI, model CORE 3, product name NIOT-E-NPI3-EN
+* netIOT Connect, product name NIOT-E-TPI51-EN-RE
+* netFIELD Connect, product name NIOT-E-TPI51-EN-RE/NFLD
+* Raspberry Pi, model 3B
+
+netPI devices specifically feature a restricted Docker protecting the Docker host system software's integrity by maximum. The restrictions are
+
+* privileged mode is not automatically adding all host devices `/dev/` to a container
+* volume bind mounts to rootfs is not supported
+* the devices `/dev`,`/dev/mem`,`/dev/sd*`,`/dev/dm*`,`/dev/mapper`,`/dev/mmcblk*` cannot be added to a container
+
 ### Container setup
+
+#### Environment variable (optional)
+
+The container binds the SSH server port to `22` by default.
+
+For an alternative port use the environment variable **SSHPORT** with the desired port number as value.
 
 #### Port mapping, network mode
 
 The container needs to run in `host` network mode.
 
-Using this mode makes port mapping unnecessary since all the used container ports (like 22) are exposed to the host automatically.
+This mode makes port mapping unnecessary. The following TCP/UDP container ports are exposed to the host automatically
+
+Used port | Protocol | By application | Remark
+:---------|:------ |:------ |:-----
+*22 or SSHPORT* | TCP | SSH server
+*5900* | TCP | VNC server | 
 
 #### Host devices
 
@@ -43,7 +62,11 @@ The privileged mode option needs to be activated to lift the standard Docker enf
 
 ### Container deployment
 
-STEP 1. Open netPI's website in your browser (https).
+Pulling the image may take 10 minutes.
+
+#### netPI example
+
+STEP 1. Open netPI's web UI in your browser (https).
 
 STEP 2. Click the Docker tile to open the [Portainer.io](http://portainer.io/) Docker management user interface.
 
@@ -54,6 +77,7 @@ Parameter | Value | Remark
 *Image* | **hilschernetpi/netpi-desktop-hdmi**
 *Network > Network* | **Host** |
 *Restart policy* | **always**
+*Runtime > Env* | *name* **SSHPORT** -> *value* **any number value** | optional for different SSH port
 *Runtime > Devices > +add device* | *Host path* **/dev/tty0** -> *Container path* **/dev/tty0** | 
 *Runtime > Devices > +add device* | *Host path* **/dev/tty2** -> *Container path* **/dev/tty2** | 
 *Runtime > Devices > +add device* | *Host path* **/dev/fb0** -> *Container path* **/dev/fb0** | 
@@ -63,19 +87,49 @@ Parameter | Value | Remark
 
 STEP 4. Press the button *Actions > Start/Deploy container*
 
-Pulling the image may take a while (5-10mins). Sometimes it may take too long and a time out is indicated. In this case repeat STEP 4.
+#### Docker command line example
+
+`docker run -d --privileged --network=host --restart=always -e SSHPORT=22 --device=/dev/tty0:/dev/tty0 --device=/dev/tty2:/dev/tty2 --device=/dev/fb0:/dev/fb0 --device=/dev/input:/dev/input --device=/dev/snd:/dev/snd -p 22:22/tcp -p 5900:5900 hilschernetpi/netpi-desktop-hdmi`
+
+#### Docker compose example
+
+A `docker-compose.yml` file could look like this
+
+    version: "2"
+
+    services:
+     desktop:
+       image: hilschernetpi/netpi-desktop-hdmi
+       restart: always
+       privileged: true
+       network_mode: host
+       ports:
+         - 22:22
+         - 5900:5900
+       devices:
+         - "/dev/tty0:/dev/tty0"
+         - "/dev/tty2:/dev/tty2"
+         - "/dev/fb0:/dev/fb0"
+         - "/dev/input:/dev/input"
+         - "/dev/snd:/dev/snd"
+       environment:
+         - SSHPORT=22
 
 ### Container access
 
-Make sure you have a mouse and keyboard connected before you start the container else they are not recognized. 
-
-A HDMI monitor in general will only be recognized if it was already connected during netPI's boot sequence else the screen remains black.
-
 The container starts the desktop over HDMI, the SSH server, the VNC server and AnyDesk automatically when deployed.
+
+Make sure you have a mouse and keyboard connected before you deploy the container else they are not recognized by it.
+
+A HDMI monitor in general will only be recognized if it was already connected when the device is powered else the screen remains black.
 
 #### ssh
 
-Login to the container with an SSH client such as [putty](http://www.putty.org/) using netPI's IP address at port `22`. Use the credentials `testuser` as user and `mypassword` as password when asked and you are logged in as user testuser.
+For an SSH terminal session use an SSH client such as [putty](http://www.putty.org/) with the Docker host IP address (@port number `22` or **SSHPORT** or bridge mode mapped one).
+
+Use the credentials `testuser` as user and `mypassword` as password when asked and you are logged in as non-root user `testuser`.
+
+Continue to use [Linux commands](https://www.raspberrypi.org/documentation/linux/usage/commands.md) in the terminal as usual.
 
 #### VNC
 
@@ -85,19 +139,13 @@ Control the desktop with any VNC client over port `5900`. The [REALVNC viewer](h
 
 Control the desktop over the internet with [AnyDesk software](https://anydesk.com/en). Use the `This Desk ID` shown on the desktop in the AnyDesk software `Remote Desk ID` field to connect. Accept the connection on the desktop afterwards.
 
-### Container tips & tricks
+### License
 
-For additional help or information visit the Hilscher Forum at https://forum.hilscher.com/
+Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All rights reserved.
+Licensed under the LISENSE.txt file information stored in the project's source code repository.
 
-### Container automated build
-
-The project complies with the scripting based [Dockerfile](https://docs.docker.com/engine/reference/builder/) method to build the image output file. Using this method is a precondition for an [automated](https://docs.docker.com/docker-hub/builds/) web based build process on DockerHub platform.
-
-DockerHub web platform is x86 CPU based, but an ARM CPU coded output file is needed for Raspberry Pi systems. This is why the Dockerfile includes the [balena](https://balena.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/) steps.
-
-#### License
-
-View the license information for the software in the project. As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
+As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
 As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.
 
 [![N|Solid](http://www.hilscher.com/fileadmin/templates/doctima_2013/resources/Images/logo_hilscher.png)](http://www.hilscher.com)  Hilscher Gesellschaft fuer Systemautomation mbH  www.hilscher.com
+

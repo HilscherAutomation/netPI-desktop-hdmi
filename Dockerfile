@@ -10,16 +10,13 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/HilscherAutomation/netPI-desktop-hdmi" \
       org.label-schema.vcs-ref=$VCS_REF
 
-#enable building ARM container on x86 machinery on the web (comment out next line if built on Raspberry) 
-RUN [ "cross-build-start" ]
-
 #version
-ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.3.1
+ENV HILSCHERNETPI_DESKTOP_HDMI_VERSION 1.4.0
 
 #labeling
 LABEL maintainer="netpi@hilscher.com" \ 
       version=$HILSCHERNETPI_DESKTOP_HDMI_VERSION \
-      description="Desktop (HDMI) for netPI"
+      description="Desktop"
 
 #set user credentials
 ENV USER=testuser
@@ -108,9 +105,6 @@ EXPOSE 22
 
 #set STOPSGINAL
 STOPSIGNAL SIGTERM
-
-#stop processing ARM emulation (comment out next line if built on Raspberry)
-RUN [ "cross-build-end" ]
 
 #start container as non-root user, else chromium will not run
 USER $USER

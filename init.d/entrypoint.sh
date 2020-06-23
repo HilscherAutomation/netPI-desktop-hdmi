@@ -10,6 +10,9 @@ term_handler() {
   sudo kill -SIGTERM "$pidxserver"
   tail --pid=$pidxserver -f /dev/null
 
+  echo "terminating ssh ..."
+  sudo /etc/init.d/ssh stop
+
   exit 143; # 128 + 15 -- SIGTERM
 }
 
@@ -61,7 +64,14 @@ sudo amixer cset numid=1 100%
 echo "starting pulseaudio ..."
 sudo pulseaudio --system --high-priority --no-cpu-limit -v -L 'module-alsa-sink device=plughw:0,1' >/dev/null 2>&1 &
 
-echo "starting ssh ..."
+echo "starting SSH server ..."
+if [ "$SSHPORT" ]; then
+  #there is an alternative SSH port configured
+  echo "the container binds the SSH server port to the configured port $SSHPORT"
+  sudo sed -i -e "s;#Port 22;Port $SSHPORT;" /etc/ssh/sshd_config
+else
+  echo "the container binds the SSH server port to the default port 22"
+fi
 sudo /etc/init.d/ssh start
 
 #set rights
